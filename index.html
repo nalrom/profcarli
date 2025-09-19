@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sonzinhos das Letras</title>
+  <meta name="description" content="Um aplicativo interativo e de tela única com sons de letras e onomatopeias, ideal para crianças pequenas." />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-1: #7c3aed; /* roxo */
+      --brand-2: #06b6d4; /* ciano */
+      --brand-3: #f59e0b; /* âmbar */
+      --brand-4: #10b981; /* esmeralda */
+      --brand-5: #ef4444; /* vermelho */
+      --brand-6: #3b82f6; /* azul */
+    }
+    body { font-family: 'Baloo 2', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; }
+    /* Animações suaves para toques */
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    .tap-pop { animation: pop 220ms ease-out; }
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      60% { transform: scale(1.2); opacity: 0.2; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .ring-pulse::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: 9999px;
+      border: 3px solid rgba(255,255,255,0.6);
+      animation: pulseRing 900ms ease-out forwards;
+      pointer-events: none;
+    }
+    /* Estilos para o exercício de arrastar e soltar */
+    .drop-box {
+      width: 50px;
+      height: 50px;
+      border: 2px dashed rgba(255,255,255,0.6);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .drop-box.filled {
+      border: 2px solid transparent;
+      background: rgba(255,255,255,0.2);
+    }
+    .drop-box.error {
+      border: 2px solid #ef4444;
+      animation: shake 0.5s;
+    }
+    .drag-item {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      cursor: grab;
+      user-select: none;
+      background: rgba(255,255,255,0.3);
+      border-radius: 8px;
+      transition: transform 0.2s ease-in-out;
+    }
+    .drag-item:active {
+      cursor: grabbing;
+      transform: scale(1.1);
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-fuchsia-500 via-sky-400 to-emerald-400 text-white">
+  <!-- Container -->
+  <div class="min-h-screen flex flex-col">
+    <!-- Top bar -->
+    <header class="relative z-10">
+      <div class="mx-auto w-full max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Miniatura da Prof Carli -->
+          <div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden bg-white/20 backdrop-blur ring-2 ring-white/40">
+            <img src="assets/images/prof-carli.png" alt="Prof Carli" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h1 class="text-xl md:text-3xl font-extrabold drop-shadow-sm">Sonzinhos das Letras</h1>
+            <p class="text-white/90 text-sm md:text-base">Com a Prof Carli</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-white/20 text-white/90 text-sm">2–6 anos</span>
+            <span class="px-3 py-1 rounded-full bg-white/20 text-white/90 text-sm">Aprender brincando</span>
+          </div>
+          <a href="https://www.tiktok.com/@profcarli" target="_blank" rel="noopener noreferrer" aria-label="TikTok da Prof Carli" class="hover:opacity-80 transition-opacity">
+            <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 122.8 122.8V209.9z"></path>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/profcarli/" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Prof Carli" class="hover:opacity-80 transition-opacity">
+            <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9 26.3 26.2 58 34.4 93.9 36.2 37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="relative flex-1 mx-auto w-full max-w-6xl px-6 py-6 md:py-8">
+      <!-- Grade das Vogais -->
+      <section id="vowelsGridSection">
+        <div class="flex items-center justify-between gap-3 mb-4 md:mb-6">
+          <h2 class="text-xl md:text-3xl font-bold">Vogais</h2>
+        </div>
+        <div id="vowelsGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 md:gap-4">
+          <!-- Populado via JS -->
+        </div>
+      </section>
+
+      <!-- Grade das Consoantes -->
+      <section id="consonantsGridSection" class="mt-12">
+        <div class="flex items-center justify-between gap-3 mb-4 md:mb-6">
+          <h2 class="text-xl md:text-3xl font-bold">Consoantes</h2>
+          <button id="shuffleColorsBtn" class="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/30 transition shadow-sm ring-1 ring-white/25">
+            <span>🎨</span><span>Mudar cores</span>
+          </button>
+        </div>
+        <div id="consonantsGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 md:gap-4">
+          <!-- Populado via JS -->
+        </div>
+      </section>
+
+      <!-- Seção do Exercício de Arrastar e Soltar -->
+      <section id="dragDropSection" class="mt-12">
+        <div class="flex items-center justify-between gap-3 mb-4 md:mb-6">
+          <h2 class="text-xl md:text-3xl font-bold">Exercício de Palavras</h2>
+        </div>
+        
+        <div class="flex items-center justify-center gap-4">
+          <button id="playWordBtn" class="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/20 hover:bg-white/30 active:bg-white/40 transition ring-1 ring-white/25">
+            <span>🔊</span>
+            <span>Ouvir a palavra</span>
+          </button>
+          <button id="startBtn" class="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/20 hover:bg-white/30 active:bg-white/40 transition ring-1 ring-white/25">
+            <span>▶️</span>
+            <span>Iniciar exercício</span>
+          </button>
+        </div>
+        
+        <div id="wordHint" class="text-6xl text-center my-6">
+          <!-- Emoji da palavra aparecerá aqui -->
+        </div>
+
+        <div id="dropZone" class="flex justify-center gap-2 md:gap-4 mb-6">
+          <!-- Drop boxes serão gerados aqui -->
+        </div>
+
+        <div class="flex justify-center flex-wrap gap-2 md:gap-4 mt-6" id="dragZone">
+          <!-- Letras para arrastar serão geradas aqui -->
+        </div>
+      </section>
+
+      <!-- Toast de Som -->
+      <div id="toast" class="pointer-events-none fixed left-1/2 -translate-x-1/2 bottom-6 md:bottom-8 opacity-0 translate-y-4 transition-all duration-300 z-50">
+        <div class="px-4 py-3 rounded-2xl bg-black/70 text-white/95 text-base md:text-lg shadow-lg ring-1 ring-white/20 flex items-center gap-2">
+          <span>🔊</span>
+          <span id="toastText"></span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Rodapé simples -->
+    <footer class="mt-auto">
+      <div class="mx-auto w-full max-w-6xl px-6 py-6 text-center text-white/90">
+        <p>Feito com carinho • Aprender pelo som</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Banco de conteúdo A–Z, com caminhos de áudio (substitua pelos seus arquivos reais)
+    const LETTERS = [
+      { l: 'A', f: '/a/', name: 'a', word: 'Abelha', emoji: '🐝', audio: { fonico: 'assets/audio/A2.mp3', name: 'assets/audio/A1.mp3', word: 'assets/audio/A3.mp3' } },
+      { l: 'A', f: '/ã/ /an/ /am/', name: 'a', word: 'Anjo', emoji: '👼', audio: { fonico: 'assets/audio/A4.mp3', name: 'assets/audio/A1.mp3', word: 'assets/audio/A5.mp3' } },
+      { l: 'B', f: '/b/', name: 'bê', word: 'Bola', emoji: '⚽️', audio: { fonico: 'assets/audio/B2.mp3', name: 'assets/audio/B1.mp3', word: 'assets/audio/B3.mp3' } },
+      { l: 'C', f: '/k/', name: 'cê', word: 'Casa', emoji: '🏠', audio: { fonico: 'assets/audio/C2.mp3', name: 'assets/audio/C1.mp3', word: 'assets/audio/C3.mp3' } },
+      { l: 'C', f: '/s/', name: 'cê', word: 'Cebola', emoji: '🧅', audio: { fonico: 'assets/audio/C4.mp3', name: 'assets/audio/C1.mp3', word: 'assets/audio/C5.mp3' } },
+      { l: 'Ç', f: '/s/', name: 'cê-cedilha', word: 'Maçã', emoji: '🍎', audio: { fonico: 'assets/audio/CC2.mp3', name: 'assets/audio/CC1.mp3', word: 'assets/audio/CC3.mp3' } },
+      { l: 'D', f: '/d/', name: 'dê', word: 'Dado', emoji: '🎲', audio: { fonico: 'assets/audio/D2.mp3', name: 'assets/audio/D1.mp3', word: 'assets/audio/D3.mp3' } },
+      { l: 'E', f: '/e/', name: 'e', word: 'Escola', emoji: '🏫', audio: { fonico: 'assets/audio/E2.mp3', name: 'assets/audio/E1.mp3', word: 'assets/audio/E3.mp3' } },
+      { l: 'E', f: '/é/', name: 'e', word: 'ÉRIC', emoji: '👨', audio: { fonico: 'assets/audio/E4.mp3', name: 'assets/audio/E1.mp3', word: 'assets/audio/E5.mp3' } },
+      { l: 'F', f: '/f/', name: 'éfe', word: 'Foca', emoji: '🦭', audio: { fonico: 'assets/audio/F2.mp3', name: 'assets/audio/F1.mp3', word: 'assets/audio/F3.mp3' } },
+      { l: 'G', f: '/g/', name: 'gê', word: 'Gato', emoji: '🐈', audio: { fonico: 'assets/audio/G2.mp3', name: 'assets/audio/G1.mp3', word: 'assets/audio/G3.mp3' } },
+      { l: 'G', f: '/j/', name: 'gê', word: 'Girafa', emoji: '🦒', audio: { fonico: 'assets/audio/G4.mp3', name: 'assets/audio/G1.mp3', word: 'assets/audio/G5.mp3' } },
+      { l: 'H', f: '(mudo)', name: 'agá', word: 'Herói', emoji: '🦸', audio: { fonico: 'assets/audio/H2.mp3', name: 'assets/audio/H1.mp3', word: 'assets/audio/H3.mp3' } },
+      { l: 'I', f: '/i/', name: 'i', word: 'Ilha', emoji: '🏝️', audio: { fonico: 'assets/audio/I2.mp3', name: 'assets/audio/I1.mp3', word: 'assets/audio/I3.mp3' } },
+      { l: 'J', f: '/j/', name: 'jota', word: 'Jacaré', emoji: '🐊', audio: { fonico: 'assets/audio/J2.mp3', name: 'assets/audio/J1.mp3', word: 'assets/audio/J3.mp3' } },
+      { l: 'K', f: '/k/', name: 'cá', word: 'Ketchup', emoji: '🥫', audio: { fonico: 'assets/audio/K2.mp3', name: 'assets/audio/K1.mp3', word: 'assets/audio/K3.mp3' } },
+      { l: 'L', f: '/l/', name: 'ele', word: 'Leão', emoji: '🦁', audio: { fonico: 'assets/audio/L2.mp3', name: 'assets/audio/L1.mp3', word: 'assets/audio/L3.mp3' } },
+      { l: 'M', f: '/m/', name: 'ême', word: 'Mala', emoji: '🧳', audio: { fonico: 'assets/audio/M2.mp3', name: 'assets/audio/M1.mp3', word: 'assets/audio/M3.mp3' } },
+      { l: 'N', f: '/n/', name: 'êne', word: 'Navio', emoji: '🚢', audio: { fonico: 'assets/audio/N2.mp3', name: 'assets/audio/N1.mp3', word: 'assets/audio/N3.mp3' } },
+      { l: 'O', f: '/o/', name: 'o', word: 'Ovo', emoji: '🥚', audio: { fonico: 'assets/audio/O2.mp3', name: 'assets/audio/O1.mp3', word: 'assets/audio/O3.mp3' } },
+      { l: 'O', f: '/ó/', name: 'o', word: 'Óculos', emoji: '👓', audio: { fonico: 'assets/audio/O4.mp3', name: 'assets/audio/O1.mp3', word: 'assets/audio/O5.mp3' } },
+      { l: 'P', f: '/p/', name: 'pê', word: 'Pato', emoji: '🦆', audio: { fonico: 'assets/audio/P2.mp3', name: 'assets/audio/P1.mp3', word: 'assets/audio/P3.mp3' } },
+      { l: 'Q', f: '/k/', name: 'quê', word: 'Queijo', emoji: '🧀', audio: { fonico: 'assets/audio/Q2.mp3', name: 'assets/audio/Q1.mp3', word: 'assets/audio/Q3.mp3' } },
+      { l: 'R', f: '/r/ /R/ (rr)', name: 'erre', word: 'Rato', emoji: '🐭', audio: { fonico: 'assets/audio/R2.mp3', name: 'assets/audio/R1.mp3', word: 'assets/audio/R3.mp3' } },
+      { l: 'S', f: '/s/', name: 'ésse', word: 'Sapo', emoji: '🐸', audio: { fonico: 'assets/audio/S2.mp3', name: 'assets/audio/S1.mp3', word: 'assets/audio/S3.mp3' } },
+      { l: 'S', f: '/z/', name: 'ésse', word: 'Rosa', emoji: '🌹', audio: { fonico: 'assets/audio/S4.mp3', name: 'assets/audio/S1.mp3', word: 'assets/audio/S5.mp3' } },
+      { l: 'T', f: '/t/', name: 'tê', word: 'Tatu', emoji: '🦔', audio: { fonico: 'assets/audio/T2.mp3', name: 'assets/audio/T1.mp3', word: 'assets/audio/T3.mp3' } },
+      { l: 'U', f: '/u/', name: 'u', word: 'Uva', emoji: '🍇', audio: { fonico: 'assets/audio/U2.mp3', name: 'assets/audio/U1.mp3', word: 'assets/audio/U3.mp3' } },
+      { l: 'V', f: '/v/', name: 'vê', word: 'Vaca', emoji: '🐄', audio: { fonico: 'assets/audio/V2.mp3', name: 'assets/audio/V1.mp3', word: 'assets/audio/V3.mp3' } },
+      { l: 'W', f: '/w/', name: 'dáblio', word: 'William', emoji: '👨‍🦱', audio: { fonico: 'assets/audio/W2.mp3', name: 'assets/audio/W1.mp3', word: 'assets/audio/W3.mp3' } },
+      { l: 'W', f: '/v/', name: 'dáblio', word: 'Wagner', emoji: '👨‍🦳', audio: { fonico: 'assets/audio/W4.mp3', name: 'assets/audio/W1.mp3', word: 'assets/audio/W5.mp3' } },
+      { l: 'X', f: '/x/', name: 'xis', word: 'Xícara', emoji: '☕️', audio: { fonico: 'assets/audio/X2.mp3', name: 'assets/audio/X1.mp3', word: 'assets/audio/X3.mp3' } },
+      { l: 'Y', f: '/i/', name: 'ípsilon', word: 'Yasmin', emoji: '👩‍🦱', audio: { fonico: 'assets/audio/Y2.mp3', name: 'assets/audio/Y1.mp3', word: 'assets/audio/Y3.mp3' } },
+      { l: 'Z', f: '/z/', name: 'zê', word: 'Zebra', emoji: '🦓', audio: { fonico: 'assets/audio/Z2.mp3', name: 'assets/audio/Z1.mp3', word: 'assets/audio/Z3.mp3' } },
+    ];
+    const VOGAIS = LETTERS.filter(l => "AEIOU".includes(l.l));
+    const CONSOANTES = LETTERS.filter(l => !"AEIOU".includes(l.l));
+    
+    // Áudios de feedback para o exercício
+    const SUCCESS_AUDIO = "assets/audio/muito_bem.mp3";
+    const ERROR_AUDIO = "assets/audio/erro.mp3";
+
+    // Cores para cartõezinhos (ciclando)
+    const COLOR_CLASSES = [
+      'from-cyan-400 to-blue-500',
+      'from-emerald-400 to-teal-500',
+      'from-amber-400 to-orange-500',
+      'from-fuchsia-400 to-pink-500',
+      'from-violet-400 to-indigo-500',
+      'from-rose-400 to-red-500'
+    ];
+
+    const vowelsGrid = document.getElementById('vowelsGrid');
+    const consonantsGrid = document.getElementById('consonantsGrid');
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+    const shuffleColorsBtn = document.getElementById('shuffleColorsBtn');
+
+    // Elementos do exercício
+    const startBtn = document.getElementById('startBtn');
+    const playWordBtn = document.getElementById('playWordBtn');
+    const dropZone = document.getElementById('dropZone');
+    const dragZone = document.getElementById('dragZone');
+    const wordHint = document.getElementById('wordHint');
+    
+    let colorOffset = 0;
+    let currentWord = null;
+
+    function playAudio(url) {
+        if (url) {
+            new Audio(url).play().catch(e => {
+              console.error("Erro ao tocar o áudio. Verifique se o arquivo existe ou o caminho está correto:", url, e);
+              showToast("Áudio não encontrado!");
+            });
+        } else {
+            showToast("Áudio não disponível!");
+        }
+    }
+
+    function showToast(text) {
+      toastText.textContent = text;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 1200);
+    }
+
+    function buttonPop(el) {
+      el.classList.remove('tap-pop');
+      void el.offsetWidth;
+      el.classList.add('tap-pop');
+    }
+
+    function makeCard(data, index) {
+      const isLetter = !!data.l;
+      const wrap = document.createElement('div');
+      wrap.className = `
+        group relative overflow-hidden rounded-3xl p-0 md:p-0 text-left
+        bg-gradient-to-br text-white shadow-md ring-1 ring-white/25
+        ${COLOR_CLASSES[(index + colorOffset) % COLOR_CLASSES.length]}
+        hover:brightness-105 active:brightness-110 transition flex flex-col justify-between h-full
+      `.trim();
+      
+      wrap.innerHTML = `
+        <!-- Botão para o nome da letra -->
+        <button type="button" aria-label="Ouvir o nome da letra ${data.l}" data-audio-type="name"
+          class="flex-1 w-full p-2 md:p-4 text-left flex items-center justify-between tap-pop">
+          <div>
+            <div class="text-2xl md:text-3xl font-extrabold drop-shadow-sm">${data.l}</div>
+            <div class="mt-1 text-white/95 text-xs md:text-sm">Nome: ${data.name}</div>
+          </div>
+          <span class="text-xl">🔊</span>
+        </button>
+        <!-- Separador -->
+        <hr class="border-white/20 my-0" />
+        <!-- Botão para o som fônico -->
+        <button type="button" aria-label="Ouvir o som fônico de ${data.l}" data-audio-type="fonico"
+          class="flex-1 w-full p-2 md:p-4 text-left flex items-center justify-between tap-pop">
+          <div>
+            <div class="text-2xl md:text-3xl font-extrabold drop-shadow-sm">${data.f}</div>
+            <div class="mt-1 text-white/95 text-xs md:text-sm">Som fônico</div>
+          </div>
+          <span class="text-xl">🔊</span>
+        </button>
+        <!-- Separador -->
+        <hr class="border-white/20 my-0" />
+        <!-- Botão para a aplicação da letra -->
+        <button type="button" aria-label="Ouvir a palavra ${data.word}" data-audio-type="word"
+          class="flex-1 w-full p-2 md:p-4 text-left flex items-center justify-between tap-pop">
+          <div>
+            <div class="text-lg md:text-2xl font-extrabold drop-shadow-sm flex flex-wrap items-center gap-x-2">
+              <span>${data.word.toUpperCase()}</span>
+              <span class="text-2xl">${data.emoji}</span>
+            </div>
+            <div class="mt-1 text-white/95 text-xs md:text-sm">Aplicação</div>
+          </div>
+          <span class="text-xl">🔊</span>
+        </button>
+      `;
+
+      // Adiciona listeners para os novos botões
+      wrap.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const audioType = button.getAttribute('data-audio-type');
+          let audioUrl, toastTextContent;
+
+          if (audioType === 'name') {
+            audioUrl = data.audio.name;
+            toastTextContent = data.name;
+          } else if (audioType === 'fonico') {
+            audioUrl = data.audio.fonico;
+            toastTextContent = data.f;
+          } else if (audioType === 'word') {
+            audioUrl = data.audio.word;
+            toastTextContent = data.word;
+          }
+
+          buttonPop(button);
+          playAudio(audioUrl);
+          showToast(toastTextContent);
+        });
+      });
+
+      return wrap;
+    }
+
+    function renderGrids() {
+      vowelsGrid.innerHTML = '';
+      VOGAIS.forEach((item, i) => {
+        vowelsGrid.appendChild(makeCard(item, i));
+      });
+      
+      consonantsGrid.innerHTML = '';
+      CONSOANTES.forEach((item, i) => {
+        consonantsGrid.appendChild(makeCard(item, i));
+      });
+    }
+
+    if (shuffleColorsBtn) {
+      shuffleColorsBtn.addEventListener('click', () => {
+        buttonPop(shuffleColorsBtn);
+        colorOffset = (colorOffset + 1) % COLOR_CLASSES.length;
+        renderGrids();
+      });
+    }
+
+    // --- Lógica do Exercício de Arrastar e Soltar ---
+    
+    // Filtra palavras adequadas para o exercício (ex: até 5 letras e sem acentos)
+    const playableWords = LETTERS.filter(l => l.word.length <= 5 && /^[A-Z]+$/i.test(l.word));
+
+    // Função para embaralhar um array
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function checkAnswer() {
+      const dropBoxes = Array.from(dropZone.children);
+      const userWord = dropBoxes.map(box => box.textContent).join('');
+      if (userWord === currentWord.word) {
+        showToast("Muito bem!");
+        playAudio(SUCCESS_AUDIO);
+        setTimeout(startExercise, 2000); // Inicia um novo exercício
+      }
+    }
+
+    function startExercise() {
+      // Limpa a zona de arrastar e soltar e a dica
+      dropZone.innerHTML = '';
+      dragZone.innerHTML = '';
+      wordHint.innerHTML = '';
+      
+      if (playableWords.length === 0) {
+        showToast("Nenhuma palavra para o exercício!");
+        return;
+      }
+      
+      // Seleciona uma palavra aleatória da lista de palavras jogáveis
+      const randomIndex = Math.floor(Math.random() * playableWords.length);
+      const selectedWordData = playableWords[randomIndex];
+
+      currentWord = {
+        word: selectedWordData.word.toUpperCase(),
+        emoji: selectedWordData.emoji,
+        audio: selectedWordData.audio.word,
+        successAudio: SUCCESS_AUDIO,
+        errorAudio: ERROR_AUDIO
+      };
+
+      // Mostra a dica do emoji
+      wordHint.textContent = currentWord.emoji;
+
+      // Toca o áudio da palavra
+      playAudio(currentWord.audio);
+      showToast(`Monte a palavra: ${selectedWordData.word}`);
+
+      // Cria as caixas para soltar as letras
+      currentWord.word.split('').forEach((letter, index) => {
+        const dropBox = document.createElement('div');
+        dropBox.className = 'drop-box';
+        dropBox.dataset.correctLetter = letter;
+        dropBox.addEventListener('dragover', (e) => e.preventDefault());
+        dropBox.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const draggedLetter = e.dataTransfer.getData('text/plain');
+          const draggedElement = document.querySelector('.drag-item[data-letter="' + draggedLetter + '"]');
+
+          if (draggedElement && draggedLetter === dropBox.dataset.correctLetter && dropBox.textContent === '') {
+            dropBox.textContent = draggedLetter;
+            dropBox.classList.add('filled');
+            draggedElement.style.display = 'none'; // Esconde a letra arrastada
+            
+            // Toca o som fônico da letra correta
+            const letterData = LETTERS.find(l => l.l === draggedLetter);
+            if (letterData) {
+                playAudio(letterData.audio.fonico);
+            }
+
+            checkAnswer();
+          } else {
+            dropBox.classList.add('error');
+            setTimeout(() => dropBox.classList.remove('error'), 500);
+            playAudio(currentWord.errorAudio);
+            showToast("Ops, tente de novo!");
+          }
+        });
+        dropZone.appendChild(dropBox);
+      });
+
+      // Cria as letras para arrastar (embaralhadas)
+      const shuffledLetters = shuffleArray(currentWord.word.split(''));
+      shuffledLetters.forEach((letter) => {
+        const dragItem = document.createElement('div');
+        dragItem.className = 'drag-item';
+        dragItem.textContent = letter;
+        dragItem.draggable = true;
+        dragItem.dataset.letter = letter;
+        dragItem.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', letter);
+        });
+        dragZone.appendChild(dragItem);
+      });
+    }
+
+    startBtn.addEventListener('click', () => {
+      buttonPop(startBtn);
+      startExercise();
+    });
+
+    playWordBtn.addEventListener('click', () => {
+      buttonPop(playWordBtn);
+      if (currentWord) {
+        playAudio(currentWord.audio);
+        showToast(`Ouvindo: ${currentWord.word.toLowerCase()}`);
+      } else {
+        showToast("Inicie o exercício primeiro!");
+      }
+    });
+
+    // Inicializa a grade de letras
+    renderGrids();
+  </script>
+</body>
+</html>
+
